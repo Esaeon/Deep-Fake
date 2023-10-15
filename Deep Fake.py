@@ -3,7 +3,8 @@ from filedialog import *
 import time
 
 def main():
-    proceed = False
+    proceed1 = False
+    proceed2 = False
     
     interfaceWindow = GraphWin("Deep Fake v0.1.1", 1000, 500)
     imageChooser1 = Rectangle(Point(100, 100), Point(900, 200))
@@ -25,11 +26,10 @@ def main():
 
     imageBackground = ""
     imageFace = ""
-    while (proceed == False):
+    while (proceed1 == False & proceed2 == False):
         point = interfaceWindow.getMouse()
         pointX = point.getX()
         pointY = point.getY()
-        print(point)
 
         if ((pointX<900) & (pointX>100)):
             if ((pointY<200) & (pointY>100)):
@@ -50,14 +50,82 @@ def main():
 
         if (((pointX<700) & (pointX>300))& ((pointY<450) & (pointY>400))):
             if ((len(imageBackground)!=0) & (len(imageFace)!=0)):
-                if (imageBackground.endswith("JPG") & imageFace.endswith("JPG")):
-                    proceed = True
-                else:
-                    ErrorMessage = "Files other than JPG are not supported in this iteration."
-                    ErrorMessageText = Text(Point(500, 470), ErrorMessage)
-                    ErrorMessageText.draw(interfaceWindow)
-                    time.sleep(5)
-                    ErrorMessageText.undraw()
+                AcceptedMessage = ""
+                match ((imageBackground[(imageBackground.find(".")+1):]).upper()):
+                    case "JPG":
+                        AcceptedMessage += "JPG and "
+                        proceed1 = True
+                    case "JPEG":
+                        AcceptedMessage += "JPEG and "
+                        proceed1 = True
+                    case "PNG":
+                        AcceptedMessage += "PNG and "
+                        proceed1 = True
+                    case "TIFF":
+                        ErrorMessage = "Currently an unknown image type; will possibly implement in the future."
+                        ErrorMessageText = Text(Point(500, 470), ErrorMessage)
+                        ErrorMessageText.draw(interfaceWindow)
+                        time.sleep(3)
+                        ErrorMessageText.undraw()
+                        continue
+                    case "PDF":
+                        ErrorMessage = "PDFs could work, but you need to download the images;the program cannot currently download PDFs from the web."
+                        ErrorMessageText = Text(Point(500, 470), ErrorMessage)
+                        ErrorMessageText.draw(interfaceWindow)
+                        time.sleep(3)
+                        ErrorMessageText.undraw()
+                        continue
+                    case _:
+                        ErrorMessage = "This is an unsupported file type."
+                        ErrorMessageText = Text(Point(500, 470), ErrorMessage)
+                        ErrorMessageText.draw(interfaceWindow)
+                        time.sleep(3)
+                        ErrorMessageText.undraw()
+                        continue
+
+                match ((imageFace[(imageFace.find(".")+1):]).upper()):
+                    case "JPG":
+                        AcceptedMessage += "JPG files selected."
+                        proceed2 = True
+                        AcceptedMessageText = Text(Point(500, 470), AcceptedMessage)
+                        AcceptedMessageText.draw(interfaceWindow)
+                        time.sleep(1)
+                        AcceptedMessageText.undraw()
+                    case "JPEG":
+                        AcceptedMessage += "JPEG files selected."
+                        proceed2 = True
+                        AcceptedMessageText = Text(Point(500, 470), AcceptedMessage)
+                        AcceptedMessageText.draw(interfaceWindow)
+                        time.sleep(1)
+                        AcceptedMessageText.undraw()
+                    case "PNG":
+                        AcceptedMessage += "PNG files selected."
+                        proceed2 = True
+                        AcceptedMessageText = Text(Point(500, 470), AcceptedMessage)
+                        AcceptedMessageText.draw(interfaceWindow)
+                        time.sleep(1)
+                        AcceptedMessageText.undraw()
+                    case "TIFF":
+                        ErrorMessage = "Currently an unknown image type; will possibly implement in the future."
+                        ErrorMessageText = Text(Point(500, 470), ErrorMessage)
+                        ErrorMessageText.draw(interfaceWindow)
+                        time.sleep(3)
+                        ErrorMessageText.undraw()
+                        continue
+                    case "PDF":
+                        ErrorMessage = "PDFs could work, but you need to download the images;the program cannot currently download PDFs from the web."
+                        ErrorMessageText = Text(Point(500, 470), ErrorMessage)
+                        ErrorMessageText.draw(interfaceWindow)
+                        time.sleep(3)
+                        ErrorMessageText.undraw()
+                        continue
+                    case _:
+                        ErrorMessage = "This is an unsupported file type."
+                        ErrorMessageText = Text(Point(500, 470), ErrorMessage)
+                        ErrorMessageText.draw(interfaceWindow)
+                        time.sleep(3)
+                        ErrorMessageText.undraw()
+                        continue
                 
             else:
                 ErrorMessage = "Please choose two files."
@@ -67,6 +135,15 @@ def main():
                 ErrorMessageText.undraw()
 
     interfaceWindow.close()
+#####################################################################
+    imageWindow = GraphWin("Deep Fake v0.1.1 Sprint Demo", 1300, 800)
+    drawBackground = Image(Point(0,0), imageBackground)
+    drawFace = Image(Point(975,0), imageFace)
+
+    drawBackground.draw(imageWindow)
+    drawFace.draw(imageWindow)
+    
+
     
 
 

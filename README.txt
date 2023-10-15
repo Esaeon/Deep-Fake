@@ -1,9 +1,8 @@
-Before you run this code, please keep in mind that the current version
-RUNS ON PILLOW. To do so, go through the following:
+Pillow is no longer needed!
 
-Go to this site: https://pillow.readthedocs.io/en/stable/installation.html;
-Instead of "python" or "python3" being used, use "py". Everything else is as written.
+Currently, this version is 0.1.2, considering that images are now able
+to be displayed on Graphics Windows. The Graphics Windows package is included
+so there is no need to worry.
 
-We will try and find a way to display images without using Pillow in the future.
-
-Graphics Window is already implemented. No need to worry about it.
+File Dialog is also a handy tool that asks for the file name of the image
+one wants to load. That Python package is also included.
