@@ -6,3 +6,5 @@ so there is no need to worry.
 
 File Dialog is also a handy tool that asks for the file name of the image
 one wants to load. That Python package is also included.
+
+The Python Version needs to be at least 3.10; otherwise you will run into a syntax error with match-case, Python's version of switch-cases.
