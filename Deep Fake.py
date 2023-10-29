@@ -5,8 +5,13 @@ import sys
 from sys import platform
 
 def main():
-    print(platform)
-    input()
+    if (platform == "win32"):
+        from PILWindows import Image
+    elif (platform == "darwin"):
+        from PILmacOS import Image
+    else:
+        print("DO NOT CONTINUE; IT IS TOO DANGEROUS HERE.")
+        sys.exit(1)
     
     proceed1 = False
     proceed2 = False
