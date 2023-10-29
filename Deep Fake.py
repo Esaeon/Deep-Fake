@@ -1,10 +1,13 @@
 from graphics import *
 from filedialog import *
-from PIL import Image
 import time
 import sys
+from sys import platform
 
 def main():
+    print(platform)
+    input()
+    
     proceed1 = False
     proceed2 = False
     
