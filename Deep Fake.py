@@ -1,6 +1,8 @@
 from graphics import *
 from filedialog import *
+from PIL import Image
 import time
+import sys
 
 def main():
     proceed1 = False
@@ -31,24 +33,24 @@ def main():
         pointX = point.getX()
         pointY = point.getY()
 
-        if ((pointX<900) & (pointX>100)):
-            if ((pointY<200) & (pointY>100)):
+        if ((pointX<=900) & (pointX>=100)):
+            if ((pointY<=200) & (pointY>=100)):
                 if (len(imageBackground)!=0):
                     imageBackgroundText.undraw()
                 imageBackground = askopenfilename()
                 imageBackgroundText = Text(Point(500,220), imageBackground)
                 imageBackgroundText.draw(interfaceWindow)
 
-            elif ((pointY<350) & (pointY>250)):
+            elif ((pointY<=350) & (pointY>=250)):
                 if (len(imageFace)!=0):
                     imageFaceText.undraw()
                 imageFace = askopenfilename()
                 imageFaceText = Text(Point(500,370), imageFace)
                 imageFaceText.draw(interfaceWindow)
 
-            else: time.sleep(1)
+            else: time.sleep(0)
 
-        if (((pointX<700) & (pointX>300))& ((pointY<450) & (pointY>400))):
+        if (((pointX<=700) & (pointX>=300))& ((pointY<=450) & (pointY>=400))):
             if ((len(imageBackground)!=0) & (len(imageFace)!=0)):
                 AcceptedMessage = ""
                 match ((imageBackground[(imageBackground.find(".")+1):]).upper()):
@@ -136,15 +138,55 @@ def main():
 
     interfaceWindow.close()
 #####################################################################
-    imageWindow = GraphWin("Deep Fake v0.1.1 Sprint Demo", 1300, 800)
-    drawBackground = Image(Point(0,0), imageBackground)
-    drawFace = Image(Point(975,0), imageFace)
+    imageWindow = GraphWin("Deep Fake v0.1.1 Sprint Demo", 700, 700)
 
-    drawBackground.draw(imageWindow)
-    drawFace.draw(imageWindow)
+    proceedText = Text(Point(350, 200), "Click here if this image is acceptable.")
+    proceedRectangle = Rectangle(Point(100, 100), Point(600, 300))
+    noProceedText = Text(Point(350,500), "Click here if either image is not acceptable;\nyou will need to run the program again.")
+    noProceedRectangle = Rectangle(Point(100, 400), Point(600, 600))
+    
+    proceedText.draw(imageWindow)
+    proceedRectangle.draw(imageWindow)
+    noProceedText.draw(imageWindow)
+    noProceedRectangle.draw(imageWindow)
+    i = 0
+
+    imageAlreadyOpen = False
+    while (True):
+        if (i == 0):
+            imageToDraw = imageBackground
+        elif (i == 1):
+            imageToDraw = imageFace
+        else:
+            break
+        if (imageAlreadyOpen == False):
+            imageOpened = Image.open(imageToDraw)
+            imageOpened.show()
+            imageAlreadyOpen = True
+        
+        point = imageWindow.getMouse()
+        pointX = point.getX()
+        pointY = point.getY()
+
+        print(point)
+        if ((pointX<=600) & (pointX>=100)):
+            if ((pointY<=300) & (pointY>=100)):
+                imageOpened.close()
+                i = i + 1
+                imageAlreadyOpen = False
+                continue
+            elif ((pointY<=600) & (pointY>=400)):
+                print("Either one of the images or both of the images were not accepted after being shown.\nTerminating program to not transmit the data over.")
+                sys.exit(1)
+            else:
+                time.sleep(0)
+
+    imageWindow.close()
+    print("Nothing for the next section has been developed yet;\n most of my time in this sprint was PURELY devoted to this bug and this bug alone...")
+                
+
     
 
-    
-
+######################################################################
 
 main()
