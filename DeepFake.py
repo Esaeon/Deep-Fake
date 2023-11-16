@@ -148,56 +148,56 @@ def main():
 
     interfaceWindow.close()
 #####################################################################
-    imageWindow = GraphWin("Deep Fake v0.1.1 Sprint Demo", 700, 700)
-
-    proceedText = Text(Point(350, 200), "Click here if this image is acceptable.")
-    proceedRectangle = Rectangle(Point(100, 100), Point(600, 300))
-    noProceedText = Text(Point(350,500), "Click here if either image is not acceptable;\nyou will need to run the program again.")
-    noProceedRectangle = Rectangle(Point(100, 400), Point(600, 600))
-    
-    proceedText.draw(imageWindow)
-    proceedRectangle.draw(imageWindow)
-    noProceedText.draw(imageWindow)
-    noProceedRectangle.draw(imageWindow)
-    i = 0
-
-    imageAlreadyOpen = False
-    while (True):
-        if (i == 0):
-            imageToDraw = imageBackground
-        elif (i == 1):
-            imageToDraw = imageFace
-        else:
-            break
-        if (imageAlreadyOpen == False):
-            imageOpened = Image.open(imageToDraw)
-            imageOpened.show()
-            imageAlreadyOpen = True
-        
-        point = imageWindow.getMouse()
-        pointX = point.getX()
-        pointY = point.getY()
-
-        print(point)
-        if ((pointX<=600) & (pointX>=100)):
-            if ((pointY<=300) & (pointY>=100)):
-                imageOpened.close()
-                i = i + 1
-                imageAlreadyOpen = False
-                continue
-            elif ((pointY<=600) & (pointY>=400)):
-                print("Either one of the images or both of the images were not accepted after being shown.\nTerminating program to not transmit the data over.")
-                sys.exit(1)
-            else:
-                time.sleep(0)
-
-    imageWindow.close()        
+##    imageWindow = GraphWin("Deep Fake v0.1.1 Sprint Demo", 700, 700)
+##
+##    proceedText = Text(Point(350, 200), "Click here if this image is acceptable.")
+##    proceedRectangle = Rectangle(Point(100, 100), Point(600, 300))
+##    noProceedText = Text(Point(350,500), "Click here if either image is not acceptable;\nyou will need to run the program again.")
+##    noProceedRectangle = Rectangle(Point(100, 400), Point(600, 600))
+##    
+##    proceedText.draw(imageWindow)
+##    proceedRectangle.draw(imageWindow)
+##    noProceedText.draw(imageWindow)
+##    noProceedRectangle.draw(imageWindow)
+##    i = 0
+##
+##    imageAlreadyOpen = False
+##    while (True):
+##        if (i == 0):
+##            imageToDraw = imageBackground
+##        elif (i == 1):
+##            imageToDraw = imageFace
+##        else:
+##            break
+##        if (imageAlreadyOpen == False):
+##            imageOpened = Image.open(imageToDraw)
+##            imageOpened.show()
+##            imageAlreadyOpen = True
+##        
+##        point = imageWindow.getMouse()
+##        pointX = point.getX()
+##        pointY = point.getY()
+##
+##        print(point)
+##        if ((pointX<=600) & (pointX>=100)):
+##            if ((pointY<=300) & (pointY>=100)):
+##                imageOpened.close()
+##                i = i + 1
+##                imageAlreadyOpen = False
+##                continue
+##            elif ((pointY<=600) & (pointY>=400)):
+##                print("Either one of the images or both of the images were not accepted after being shown.\nTerminating program to not transmit the data over.")
+##                sys.exit(1)
+##            else:
+##                time.sleep(0)
+##
+##    imageWindow.close()        
                 
 ######################################################################
     print("Untested lmao")
     swappedImage = SFI.swapFaces(imageFace, imageBackground)
-    
-    
+    swappedImage.show()
+    print("I'M NOT GIVING CREDIT TO SOMEONE THAT ALMOST MADE US PAY FOR THE SOURCE CODE; THAT IS DOWNRIGHT DESPICABLE.")
     
 ######################################################################
 

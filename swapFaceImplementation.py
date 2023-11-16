@@ -1,51 +1,182 @@
 import cv2 as OpenCV
 import numpy as Numpy
+import dlib
+import time
+import sys
+from sys import platform
+if (platform == "win32"):
+    from PILWindows import Image
+##                                  CURRENTLY UNAVAILABLE; PLEASE RUN ON WINDOWS SYSTEMS.
+##    elif (platform == "darwin"):
+##        from PILmacOS import Image
+else:
+    print("DO NOT CONTINUE; IT IS TOO DANGEROUS HERE.")
+    sys.exit(1)
+
+
+def extract_index_nparray(nparray):
+    index = None
+    for num in nparray[0]:
+        index = num
+        break
+    return index
 
 def swapFaces(imageFace, imageBackground):
-    #Code by Utsav Raj:
-    #https://medium.com/@ccpvyn/creating-a-face-swapping-tool-with-opencv-and-python-4d64fc332de3
-    face = OpenCV.imread(imageFace)
-    background = OpenCV.imread(imageBackground)
+    img = OpenCV.imread(imageFace)
+    img_gray = OpenCV.cvtColor(img, OpenCV.COLOR_BGR2GRAY)
+    mask = Numpy.zeros_like(img_gray)
+    img2 = OpenCV.imread(imageBackground)
+    img2_gray = OpenCV.cvtColor(img2, OpenCV.COLOR_BGR2GRAY)
 
-    faceButGray = OpenCV.cvtColor(face, OpenCV.COLOR_BGR2GRAY)
-    backgroundButGray = OpenCV.cvtColor(background, OpenCV.COLOR_BGR2GRAY)
 
-    faceRecognition = OpenCV.CascadeClassifier(OpenCV.data.haarcascades + "haarcascade_frontalface_default.xml")
-    faceDetected = faceRecognition.detectMultiScale(faceButGray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-    backgroundDetected = faceRecognition.detectMultiScale(backgroundButGray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+    height, width, channels = img2.shape
+    img2_new_face = Numpy.zeros((height, width, channels), Numpy.uint8)
 
-    if len(faceDetected) == 0 or len(backgroundDetected) == 0:
-        print("No faces detected in one or both images.")
-        return None
 
-    face_x, face_y, faceWidth, faceHeight = faceDetected[0]
-    background_x, background_y, backgroundWidth, backgroundHeight = backgroundDetected[0]
 
-    faceRegionsOfInterest = face[face_y:face_y + faceHeight, face_x:face_x + faceWidth]
-    backgroundRegionsOfInterest = background[background_y:background_y + backgroundHeight, background_x:background_x + backgroundWidth]
 
-    model_path = "path/to/opencv_face_detector_uint8.pb"
-    config_path = "path/to/opencv_face_detector.pbtxt"
-    net = OpenCV.dnn.readNetFromTensorflow(model_path, config_path)
-    blob = OpenCV.dnn.blobFromImage(backgroundRegionsOfInterest, 1.0, (300, 300), [104, 117, 123], False)
-    net.setInput(blob)
-    landmarks = net.forward()
+    # Face 1
+    faces = detector(img_gray)
+    for face in faces:
+        landmarks = predictor(img_gray, face)
+        landmarks_points = []
+        for n in range(0, 68):
+            x = landmarks.part(n).x
+            y = landmarks.part(n).y
+            landmarks_points.append((x, y))
 
-    backgroundGuides = []
-    for i in range(68):
-        x = int(landmarks[0, 0, i, 0] * backgroundWidth) + background_x
-        y = int(landmarks[0, 0, i, 1] * backgroundHeight) + background_y
-        backgroundGuides.append((x, y))
 
-    convexHullPoints = OpenCV.convexHull(np.array(backgroundGuides), returnPoints=True)
-    convexHullMask = np.zeros(face.shape[:2], dtype=np.uint8)
-    OpenCV.fillPoly(mask, [np.array(backgroundGuides)], 255)
 
-    transformation_matrix, _ = OpenCV.estimateAffinePartial2D(np.array(backgroundGuides), np.array(faceDetected)[:,:2])
-    warpedFace = OpenCV.warpAffine(faceRegionsOfInterest, transformation_matrix, (backgroundWidth, backgroundHeight))
+        points = Numpy.array(landmarks_points, Numpy.int32)
+        convexhull = OpenCV.convexHull(points)
+        # OpenCV.polylines(img, [convexhull], True, (255, 0, 0), 3)
+        OpenCV.fillConvexPoly(mask, convexhull, 255)
 
-    backgroundFaceMasked = OpenCV.bitwise_and(backgroundRegionsOfInterest, backgroundRegionsOfInterest, mask=mask)
-    swappedFace = OpenCV.add(backgroundFaceMasked, warpedFace)
+        face_image_1 = OpenCV.bitwise_and(img, img, mask=mask)
 
-    background[background_y:background_y + backgroundHeight, background_x:background_x + backgroundWidth] = swappedFace
-    return background
+        # Delaunay triangulation
+        rect = OpenCV.boundingRect(convexhull)
+        subdiv = OpenCV.Subdiv2D(rect)
+        subdiv.insert(landmarks_points)
+        triangles = subdiv.getTriangleList()
+        triangles = Numpy.array(triangles, dtype=Numpy.int32)
+
+        indexes_triangles = []
+        for t in triangles:
+            pt1 = (t[0], t[1])
+            pt2 = (t[2], t[3])
+            pt3 = (t[4], t[5])
+
+
+            index_pt1 = Numpy.where((points == pt1).all(axis=1))
+            index_pt1 = extract_index_nparray(index_pt1)
+
+            index_pt2 = Numpy.where((points == pt2).all(axis=1))
+            index_pt2 = extract_index_nparray(index_pt2)
+
+            index_pt3 = Numpy.where((points == pt3).all(axis=1))
+            index_pt3 = extract_index_nparray(index_pt3)
+
+            if index_pt1 is not None and index_pt2 is not None and index_pt3 is not None:
+                triangle = [index_pt1, index_pt2, index_pt3]
+                indexes_triangles.append(triangle)
+
+
+
+    # Face 2
+    faces2 = detector(img2_gray)
+    for face in faces2:
+        landmarks = predictor(img2_gray, face)
+        landmarks_points2 = []
+        for n in range(0, 68):
+            x = landmarks.part(n).x
+            y = landmarks.part(n).y
+            landmarks_points2.append((x, y))
+
+
+        points2 = Numpy.array(landmarks_points2, Numpy.int32)
+        convexhull2 = OpenCV.convexHull(points2)
+
+    lines_space_mask = Numpy.zeros_like(img_gray)
+    lines_space_new_face = Numpy.zeros_like(img2)
+    # Triangulation of both faces
+    for triangle_index in indexes_triangles:
+        # Triangulation of the first face
+        tr1_pt1 = landmarks_points[triangle_index[0]]
+        tr1_pt2 = landmarks_points[triangle_index[1]]
+        tr1_pt3 = landmarks_points[triangle_index[2]]
+        triangle1 = Numpy.array([tr1_pt1, tr1_pt2, tr1_pt3], Numpy.int32)
+
+
+        rect1 = OpenCV.boundingRect(triangle1)
+        (x, y, w, h) = rect1
+        cropped_triangle = img[y: y + h, x: x + w]
+        cropped_tr1_mask = Numpy.zeros((h, w), Numpy.uint8)
+
+
+        points = Numpy.array([[tr1_pt1[0] - x, tr1_pt1[1] - y],
+                           [tr1_pt2[0] - x, tr1_pt2[1] - y],
+                           [tr1_pt3[0] - x, tr1_pt3[1] - y]], Numpy.int32)
+
+        OpenCV.fillConvexPoly(cropped_tr1_mask, points, 255)
+
+        # Lines space
+        OpenCV.line(lines_space_mask, tr1_pt1, tr1_pt2, 255)
+        OpenCV.line(lines_space_mask, tr1_pt2, tr1_pt3, 255)
+        OpenCV.line(lines_space_mask, tr1_pt1, tr1_pt3, 255)
+        lines_space = OpenCV.bitwise_and(img, img, mask=lines_space_mask)
+
+        # Triangulation of second face
+        tr2_pt1 = landmarks_points2[triangle_index[0]]
+        tr2_pt2 = landmarks_points2[triangle_index[1]]
+        tr2_pt3 = landmarks_points2[triangle_index[2]]
+        triangle2 = Numpy.array([tr2_pt1, tr2_pt2, tr2_pt3], Numpy.int32)
+
+
+        rect2 = OpenCV.boundingRect(triangle2)
+        (x, y, w, h) = rect2
+
+        cropped_tr2_mask = Numpy.zeros((h, w), Numpy.uint8)
+
+        points2 = Numpy.array([[tr2_pt1[0] - x, tr2_pt1[1] - y],
+                            [tr2_pt2[0] - x, tr2_pt2[1] - y],
+                            [tr2_pt3[0] - x, tr2_pt3[1] - y]], Numpy.int32)
+
+        OpenCV.fillConvexPoly(cropped_tr2_mask, points2, 255)
+
+        # Warp triangles
+        points = Numpy.float32(points)
+        points2 = Numpy.float32(points2)
+        M = OpenCV.getAffineTransform(points, points2)
+        warped_triangle = OpenCV.warpAffine(cropped_triangle, M, (w, h))
+        warped_triangle = OpenCV.bitwise_and(warped_triangle, warped_triangle, mask=cropped_tr2_mask)
+
+        # Reconstructing destination face
+        img2_new_face_rect_area = img2_new_face[y: y + h, x: x + w]
+        img2_new_face_rect_area_gray = OpenCV.cvtColor(img2_new_face_rect_area, OpenCV.COLOR_BGR2GRAY)
+        _, mask_triangles_designed = OpenCV.threshold(img2_new_face_rect_area_gray, 1, 255, OpenCV.THRESH_BINARY_INV)
+        warped_triangle = OpenCV.bitwise_and(warped_triangle, warped_triangle, mask=mask_triangles_designed)
+
+        img2_new_face_rect_area = OpenCV.add(img2_new_face_rect_area, warped_triangle)
+        img2_new_face[y: y + h, x: x + w] = img2_new_face_rect_area
+
+
+
+    # Face swapped (putting 1st face into 2nd face)
+    img2_face_mask = Numpy.zeros_like(img2_gray)
+    img2_head_mask = OpenCV.fillConvexPoly(img2_face_mask, convexhull2, 255)
+    img2_face_mask = OpenCV.bitwise_not(img2_head_mask)
+
+
+    img2_head_noface = OpenCV.bitwise_and(img2, img2, mask=img2_face_mask)
+    result = OpenCV.add(img2_head_noface, img2_new_face)
+
+    (x, y, w, h) = OpenCV.boundingRect(convexhull2)
+    center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
+
+    seamlesscloneImage = OpenCV.seamlessClone(result, img2, img2_head_mask, center_face2, OpenCV.NORMAL_CLONE)
+    conversionPart1 = OpenCV.cvtColor(seamlesscloneImage, OpenCV.COLOR_BGR2RGB)
+    conversionPart2 = Image.fromarray(conversionPart1)
+    return conversionPart2
