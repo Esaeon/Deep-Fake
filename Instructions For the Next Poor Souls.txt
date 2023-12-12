@@ -1,0 +1,11 @@
+Alright, for those that have taken this project over the semester, we wish you luck.
+To the best of our effort, we have documented this code for you to look at.
+
+It should run fine on Windows, although Mac and Linux will have problems with this.
+At the very least, try to find a Mac version of Pillow.
+
+We will leave the faceswapping of both photo and video for you to implement into this code. (faceswapping_in_8_steps)
+
+For this experiment, we tried our VERY BEST to implement something called FaceSwap;
+THAT CODE DID NOT LIKE OUR ATTEMPTS AT INFILTRATION, SO GOOD LUCK WITH THIS. IF YOU
+ACTUALLY MANAGE THIS, MERGE THIS BACK INTO "DEVELOP".

@@ -7,8 +7,10 @@ import swapFaceImplementation as SFI
 
 def main():
     
+##      OLD CODE; Testing Out New Code
+##      The reason we called this OLD CODE was because we tried using FaceSwap. It hates being infiltrated
+##      with our code, so good luck with this; all documentation is on the 'develop' branch.
 
-##      OLD CODE; Testing Out New Code    
 ##    if (platform == "win32"):
 ##        from PILWindows import Image
 ####                                  CURRENTLY UNAVAILABLE; PLEASE RUN ON WINDOWS SYSTEMS.
