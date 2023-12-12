@@ -190,6 +190,7 @@ def swapFaces(imageFace, imageBackground):
     (x, y, w, h) = OpenCV.boundingRect(convexhull2)
     center_face2 = (int((x + x + w) / 2), int((y + y + h) / 2))
 
+    #This section is actually ours.
     #Convert into Pillow image, and send back to the original caller.
     seamlesscloneImage = OpenCV.seamlessClone(result, img2, img2_head_mask, center_face2, OpenCV.NORMAL_CLONE)
     conversionPart1 = OpenCV.cvtColor(seamlesscloneImage, OpenCV.COLOR_BGR2RGB)
