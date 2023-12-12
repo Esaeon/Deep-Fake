@@ -6,18 +6,23 @@ from sys import platform
 import swapFaceImplementation as SFI
 
 def main():
+#   If you can find a way to import Pillow from macOS, please uncomment
+#   the code down below.
     if (platform == "win32"):
         from PILWindows import Image
-##                                  CURRENTLY UNAVAILABLE; PLEASE RUN ON WINDOWS SYSTEMS.
+##      CURRENTLY UNAVAILABLE; PLEASE RUN ON WINDOWS SYSTEMS.
 ##    elif (platform == "darwin"):
 ##        from PILmacOS import Image
     else:
         print("DO NOT CONTINUE; IT IS TOO DANGEROUS HERE.")
         sys.exit(1)
-    
+
+    #These will change to true if both the images are accepted.
     proceed1 = False
     proceed2 = False
-    
+
+    #Creates a new interface Window with three boxes;
+    #each box generates a prompt (will explain if you scroll down).
     interfaceWindow = GraphWin("Deep Fake v0.1.1", 1000, 500)
     imageChooser1 = Rectangle(Point(100, 100), Point(900, 200))
     imageChooser1.draw(interfaceWindow)
@@ -39,18 +44,26 @@ def main():
     imageBackground = ""
     imageFace = ""
     while (proceed1 == False & proceed2 == False):
+        #Gets the mouse coordinates when clicked in the window; Translates that to
+        #the x-coordinate and y-coordinate for ease of access.
         point = interfaceWindow.getMouse()
         pointX = point.getX()
         pointY = point.getY()
 
+        #Checks if the click is within the width range of the boxes;
+        #two of thm are the same.
         if ((pointX<=900) & (pointX>=100)):
             if ((pointY<=200) & (pointY>=100)):
+                #If there is already an image, undraw the reference to prepare for another reference;
+                #then, ask for the file name, proceed to generate some text with the file path, and display
+                #that file path.
                 if (len(imageBackground)!=0):
                     imageBackgroundText.undraw()
                 imageBackground = askopenfilename()
                 imageBackgroundText = Text(Point(500,220), imageBackground)
                 imageBackgroundText.draw(interfaceWindow)
 
+            #This code does the same thing, but for the second image.
             elif ((pointY<=350) & (pointY>=250)):
                 if (len(imageFace)!=0):
                     imageFaceText.undraw()
@@ -58,8 +71,14 @@ def main():
                 imageFaceText = Text(Point(500,370), imageFace)
                 imageFaceText.draw(interfaceWindow)
 
+            #This is just to ensure a default case passes.
             else: time.sleep(0)
 
+        #This one is a doozy; the reason the both of us used Python 3.11 is to use match-case;
+        #the code basically checks if the images are in supported formats. If they are, then it'll
+        #display the format types; otherwise, it will display an error message, and keep running through the loop
+        #until the supported image types are selected. Currently, JPG, JPEG, and PNG images are supported.
+        #Feel free to add in any supported formats; video was too much for us unfortunately.
         if (((pointX<=700) & (pointX>=300))& ((pointY<=450) & (pointY>=400))):
             if ((len(imageBackground)!=0) & (len(imageFace)!=0)):
                 AcceptedMessage = ""
@@ -146,55 +165,12 @@ def main():
                 time.sleep(5)
                 ErrorMessageText.undraw()
 
+    #Once the loop has successfully been exited, close the interface window.
     interfaceWindow.close()
 #####################################################################
-##    imageWindow = GraphWin("Deep Fake v0.1.1 Sprint Demo", 700, 700)
-##
-##    proceedText = Text(Point(350, 200), "Click here if this image is acceptable.")
-##    proceedRectangle = Rectangle(Point(100, 100), Point(600, 300))
-##    noProceedText = Text(Point(350,500), "Click here if either image is not acceptable;\nyou will need to run the program again.")
-##    noProceedRectangle = Rectangle(Point(100, 400), Point(600, 600))
-##    
-##    proceedText.draw(imageWindow)
-##    proceedRectangle.draw(imageWindow)
-##    noProceedText.draw(imageWindow)
-##    noProceedRectangle.draw(imageWindow)
-##    i = 0
-##
-##    imageAlreadyOpen = False
-##    while (True):
-##        if (i == 0):
-##            imageToDraw = imageBackground
-##        elif (i == 1):
-##            imageToDraw = imageFace
-##        else:
-##            break
-##        if (imageAlreadyOpen == False):
-##            imageOpened = Image.open(imageToDraw)
-##            imageOpened.show()
-##            imageAlreadyOpen = True
-##        
-##        point = imageWindow.getMouse()
-##        pointX = point.getX()
-##        pointY = point.getY()
-##
-##        print(point)
-##        if ((pointX<=600) & (pointX>=100)):
-##            if ((pointY<=300) & (pointY>=100)):
-##                imageOpened.close()
-##                i = i + 1
-##                imageAlreadyOpen = False
-##                continue
-##            elif ((pointY<=600) & (pointY>=400)):
-##                print("Either one of the images or both of the images were not accepted after being shown.\nTerminating program to not transmit the data over.")
-##                sys.exit(1)
-##            else:
-##                time.sleep(0)
-##
-##    imageWindow.close()        
-                
-######################################################################
-    print("Untested lmao")
+
+    #This calls in another method to basically swap the faces;
+    #The print statement is due to the face that we basically stole that portion of code.
     swappedImage = SFI.swapFaces(imageFace, imageBackground)
     swappedImage.show()
     print("I'M NOT GIVING CREDIT TO SOMEONE THAT ALMOST MADE US PAY FOR THE SOURCE CODE; THAT IS DOWNRIGHT DESPICABLE.")
